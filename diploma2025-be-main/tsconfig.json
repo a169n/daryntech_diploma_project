@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictBindCallApply": true, // Enabled strict bind/call/apply
+    "forceConsistentCasingInFileNames": true, // Consistent file name casing
+    "noFallthroughCasesInSwitch": true, // Prevent fallthrough in switch cases
+    "esModuleInterop": true, // Enable esModuleInterop for module imports
+    "resolveJsonModule": true // Allow importing JSON files as modules
+  },
+  "include": ["src/**/*", "prisma/seed.ts"], // Include all files in the src directory
+  "exclude": ["node_modules"] // Exclude node_modules directory
+}

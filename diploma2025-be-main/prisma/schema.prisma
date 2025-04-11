@@ -1,0 +1,111 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  admin
+  employer
+  applicant
+}
+
+enum VacancyStatus {
+  open
+  closed
+}
+
+enum ApplicationStatus {
+  approved
+  pending
+  rejected
+}
+
+model User {
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username                String    @unique
+  firstName               String
+  lastName                String
+  email                   String    @unique
+  password                String
+  role                    Role
+  avatar                  String?
+  lastLoginDate           DateTime?
+  refreshToken            String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+  cv                      String?
+  position                String?
+  referralCount           Int?
+  companyId               String?   @db.Uuid
+  isEmailVerified         Boolean   @default(false)
+  verificationToken       String?
+  verificationTokenExpiry DateTime?
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  accessToken             String?
+  Company             Company?             @relation(fields: [companyId], references: [id])
+  VacancyApplications VacancyApplication[]
+
+  @@map("users")
+  VacancyApplication VacancyApplication[] @relation("Receiver")
+}
+
+model Company {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  hhId     String @unique 
+  name     String 
+  logoUrls Json?
+
+  employees User[]
+
+  Vacancies Vacancy[]
+
+  @@index([name])
+  @@map("companies")
+}
+
+model Vacancy {
+  id          String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  companyId   String        @db.Uuid
+  title       String
+  description String
+  location    String
+  createdAt   DateTime      @default(now())
+  status      VacancyStatus
+  minSalary   String
+  maxSalary   String
+  type        String
+  requirements String[]
+  Company      Company              @relation(fields: [companyId], references: [id])
+  Applications VacancyApplication[]
+
+  @@map("vacancies")
+}
+
+model VacancyApplication {
+  id              String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String            @db.Uuid
+  vacancyId       String            @db.Uuid
+  receiverId      String            @db.Uuid
+  status          ApplicationStatus
+  comment         String?
+  applicationDate DateTime
+  cv              String?
+  extractedSkills Json?
+  comparisonResult Json?
+  matchPercentage Float?
+  
+  User       User    @relation(fields: [userId], references: [id])
+  Receiver   User    @relation("Receiver", fields: [receiverId], references: [id])
+
+  Vacancy Vacancy @relation(fields: [vacancyId], references: [id])
+
+  @@map("applications")
+}
+
